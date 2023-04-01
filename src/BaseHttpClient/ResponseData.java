@@ -1,5 +1,4 @@
 package BaseHttpClient;
-
 import org.json.JSONObject;
 
 public class ResponseData {

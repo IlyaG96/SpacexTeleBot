@@ -1,39 +1,19 @@
 package BaseHttpClient;
-import org.apache.http.HttpEntity;
+
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.OutputStream;
 import java.util.HashMap;
 
-public class BaseHttpClient {
-
-    static void raiseForStatus(int statusCode) {
-        if (statusCode >= 200 && statusCode < 300) {
-            return;
-        } throw new StatusCodeException("Status code is not OK");
-    }
-
-    public static JSONObject getJsonFromResponse(HttpEntity entity) throws IOException {
-        try {
-            if (entity != null) {
-                InputStream inputStream = entity.getContent();
-                String responseBody = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                return new JSONObject(responseBody);
-            }
-            } catch (JSONException exc) {
-                    return new JSONObject("{\"success\":\"false\"}");
-                }
-        return new JSONObject("{\"success\":\"false\"}");
-    }
-
+public class ContentDownloader extends BaseHttpClient{
     public static ResponseData execute(
             String method,
             String address,
@@ -48,13 +28,26 @@ public class BaseHttpClient {
             CloseableHttpResponse response = httpClient.execute(request);
             BaseHttpClient.raiseForStatus(response.getStatusLine().getStatusCode());
 
-            JSONObject responseJson = getJsonFromResponse(response.getEntity());
+            saveFile(response);
 
-            return new ResponseData(
-                    response.getStatusLine().getStatusCode(), responseJson);
+            return new ResponseData(200, new JSONObject("{\"success\":\"true\"}"));
+
         }
         catch (IOException | StatusCodeException exc) {
             return new ResponseData(-1, new JSONObject("{\"success\":\"false\"}"));
         }
+    }
+
+    private static void saveFile(CloseableHttpResponse response) throws IOException {
+        InputStream inputStream = response.getEntity().getContent();
+        OutputStream outputStream = new FileOutputStream("image.jpg");
+        int read = 0;
+        byte[] bytes = new byte[1024];
+        while ((read = inputStream.read(bytes)) != -1) {
+            outputStream.write(bytes, 0, read);
+        }
+        EntityUtils.consume(response.getEntity());
+        outputStream.close();
+        response.close();
     }
 }
