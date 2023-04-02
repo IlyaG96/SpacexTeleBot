@@ -5,6 +5,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +22,14 @@ public class BaseHttpClient {
         } throw new StatusCodeException("Status code is not OK");
     }
 
+    public static boolean notEmptyJsonArray(JSONArray urls) {
+        return !urls.isEmpty();
+    }
+
+    static String getFilenameFromURI(String path) {
+        return path.replace("/", "");
+    }
+
     public static JSONObject getJsonFromResponse(HttpEntity entity) throws IOException {
         try {
             if (entity != null) {
@@ -35,7 +44,7 @@ public class BaseHttpClient {
     }
 
     public static ResponseData execute(
-            String method,
+            HttpMethod method,
             String address,
             HashMap<String, String> tagsToReplace) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -49,7 +58,7 @@ public class BaseHttpClient {
             BaseHttpClient.raiseForStatus(response.getStatusLine().getStatusCode());
 
             JSONObject responseJson = getJsonFromResponse(response.getEntity());
-
+            System.out.println("Get pack of images");
             return new ResponseData(
                     response.getStatusLine().getStatusCode(), responseJson);
         }

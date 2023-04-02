@@ -6,16 +6,17 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class RequestBuilder {
 
-    public static HttpRequestBase createRequest(String method,
+    public static HttpRequestBase createRequest(HttpMethod method,
                                                 String address,
                                                 HashMap<String, String> body,
                                                 HashMap<String, String> payload,
-                                                HashMap<String, String> tagsToReplace) {
+                                                HashMap<String, String> tagsToReplace) throws IOException {
         if (tagsToReplace != null) {
             address = replaceTags(address, tagsToReplace);
         }
@@ -24,16 +25,16 @@ public class RequestBuilder {
             address = setQuery(payload, address);
         }
 
-        if (method.equalsIgnoreCase("POST")) {
+        if (method == (HttpMethod.POST)) {
             HttpPost request  = new HttpPost(address);
             if (body != null) {
                 request.setEntity(buildJsonBody(body));
             }
             return request;
-        } else if (method.equalsIgnoreCase("GET")) {
+        } else if (method == HttpMethod.GET) {
             return new HttpGet(address);
         } else {
-            throw new StatusCodeException("111");
+            throw new IOException();
         }
     }
 
