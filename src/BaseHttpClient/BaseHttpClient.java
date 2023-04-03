@@ -46,19 +46,21 @@ public class BaseHttpClient {
     public static ResponseData execute(
             HttpMethod method,
             String address,
+            HashMap<String, String> body,
+            HashMap<String, String> queryParams,
             HashMap<String, String> tagsToReplace) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpRequestBase request = RequestBuilder.createRequest(
                     method,
                     address,
-                    null,
-                    null,
+                    body,
+                    queryParams,
                     tagsToReplace);
             CloseableHttpResponse response = httpClient.execute(request);
             BaseHttpClient.raiseForStatus(response.getStatusLine().getStatusCode());
 
             JSONObject responseJson = getJsonFromResponse(response.getEntity());
-            System.out.println("Get pack of images");
+
             return new ResponseData(
                     response.getStatusLine().getStatusCode(), responseJson);
         }

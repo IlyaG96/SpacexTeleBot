@@ -17,6 +17,8 @@ public class RequestBuilder {
                                                 HashMap<String, String> body,
                                                 HashMap<String, String> payload,
                                                 HashMap<String, String> tagsToReplace) throws IOException {
+        System.out.println(address);
+
         if (tagsToReplace != null) {
             address = replaceTags(address, tagsToReplace);
         }
@@ -32,6 +34,7 @@ public class RequestBuilder {
             }
             return request;
         } else if (method == HttpMethod.GET) {
+            System.out.println(address);
             return new HttpGet(address);
         } else {
             throw new IOException();
@@ -55,8 +58,10 @@ public class RequestBuilder {
     }
     private static String buildQueryParams(HashMap<String, String> bodyContent) {
         StringBuilder body = new StringBuilder();
+        body.append("?");
         for (Map.Entry<String, String> map : bodyContent.entrySet()) {
-            body.append("?").append(map.getKey()).append("=").append(map.getValue()).append("&");
+            body.append(
+                    map.getKey().replace(" ", "%20")).append("=").append(map.getValue().replace(" ", "%20")).append("&");
         }
 
         return body.toString();

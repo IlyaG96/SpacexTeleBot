@@ -1,3 +1,5 @@
+package Config;
+
 import Exceptions.NullValueException;
 
 import java.io.IOException;

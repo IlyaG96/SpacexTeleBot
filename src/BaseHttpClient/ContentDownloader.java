@@ -15,7 +15,7 @@ import java.net.URL;
 
 import static BaseHttpClient.BaseHttpClient.getFilenameFromURI;
 
-public class ContentDownloader implements Runnable{
+public class ContentDownloader implements Runnable {
 
     public final JSONArray urls;
     public ContentDownloader(JSONArray urls) {
